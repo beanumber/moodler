@@ -1,26 +1,26 @@
 globalVariables(c("Groups", "grade", "criterion", "."))
 
 #' Generate feedback report for Moodle
-#' @param x key to Googlesheet
-#' @param ... arguments passed to \code{\link[googlesheets]{gs_key}}
+#' @param x a data.frame
 #' @import dplyr
 #' @export
 #' @examples
 #' \dontrun{
-#' key <- "1FA7XrFQ1h6Lss-c8__RvQceG0-vIO2vXR1hPcdD49-o"
-#' feedback(key, visibility = "private")
+#' key <- "1S0vfV_xkebyTkC2bmhOv-MDNMLulb95GFwfvI9ZPtGw"
+#' if (gogglesheets) {
+#'   grades <- key %>%
+#'     gs_key() %>%
+#'     gs_read()
+#' }
+#' feedback(grades)
 #' }
 
-feedback <- function(x, ...) {
-  grades <- googlesheets::gs_key(x, ...) %>%
-    googlesheets::gs_read()
-
-  grades %>%
+feedback <- function(x) {
+  x %>%
     filter(!is.na(Groups)) %>%
     split(.$Groups) %>%
     purrr::map(display)
 }
-
 
 
 display <- function(x) {
@@ -32,6 +32,6 @@ display <- function(x) {
 
   c(paste("Total:", x$Total),
     paste("Comments:", x$Comments),
-    paste("Discretionary Points:", x$`0 to 2 reflects the professor’s judgment of the overall quality of your submission`),
+    paste("Discretionary Points:", x$discretionary),
     out)
 }

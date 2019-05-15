@@ -4,19 +4,22 @@
 \alias{feedback}
 \title{Generate feedback report for Moodle}
 \usage{
-feedback(x, ...)
+feedback(x)
 }
 \arguments{
-\item{x}{key to Googlesheet}
-
-\item{...}{arguments passed to \code{\link[googlesheets]{gs_key}}}
+\item{x}{a data.frame}
 }
 \description{
 Generate feedback report for Moodle
 }
 \examples{
 \dontrun{
-key <- "1FA7XrFQ1h6Lss-c8__RvQceG0-vIO2vXR1hPcdD49-o"
-feedback(key, visibility = "private")
+key <- "1S0vfV_xkebyTkC2bmhOv-MDNMLulb95GFwfvI9ZPtGw"
+if (gogglesheets) {
+  grades <- key \%>\%
+    gs_key() \%>\%
+    gs_read()
+}
+feedback(grades)
 }
 }

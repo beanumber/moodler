@@ -1,15 +1,19 @@
 Package: moodler
 Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: person("Benjamin", "Baumer", email = "ben.baumer@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4.4)
 Imports:
     dplyr,
+    fs,
     googlesheets,
     purrr,
+    stringr,
     tidyr,
 License: CC0
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
+Suggests: 
+    testthat (>= 2.1.0)
