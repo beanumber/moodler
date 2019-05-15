@@ -3,11 +3,14 @@
 \name{install_makefile}
 \alias{install_makefile}
 \alias{summarize_assignment}
+\alias{winnow_group_submissions}
 \title{Install makefiles}
 \usage{
 install_makefile(path)
 
 summarize_assignment(path)
+
+winnow_group_submissions(path)
 }
 \arguments{
 \item{path}{A character vector of one or more paths.}

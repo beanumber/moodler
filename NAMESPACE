@@ -3,4 +3,5 @@
 export(feedback)
 export(install_makefile)
 export(summarize_assignment)
+export(winnow_group_submissions)
 import(dplyr)

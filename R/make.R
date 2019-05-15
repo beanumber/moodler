@@ -1,4 +1,4 @@
-globalVariables(c("my_group", "ext"))
+globalVariables(c("my_group", "ext", "value", "folder_name", "group"))
 
 #' Install makefiles
 #' @inheritParams fs::is_dir
@@ -15,7 +15,7 @@ install_makefile <- function(path) {
     warning(paste(path, "is not a directory. Using parent directory"))
   }
   path <- fs::path(path, "makefile")
-  fs::file_copy(system.file("make", "makefile", package = "sds"), path,
+  fs::file_copy(system.file("makefile", package = "moodler"), path,
                 overwrite = TRUE)
 }
 
@@ -39,4 +39,25 @@ summarize_assignment <- function(path) {
       html = sum(ext == "html")
     ) %>%
     filter(!is.na(my_group))
+}
+
+#' @rdname install_makefile
+#' @export
+#'
+winnow_group_submissions <- function(path) {
+  dirs <- fs::dir_ls(path) %>%
+    tibble::enframe(name = NULL) %>%
+    dplyr::mutate(
+      folder_name = fs::path_file(value),
+      group = stringr::str_extract(folder_name, "Group_[A-Z]+")
+    ) %>%
+    group_by(group) %>%
+    mutate(rank = min_rank(folder_name)) %>%
+    filter(!is.na(group))
+
+  to_delete <- dirs %>%
+    filter(rank != 1) %>%
+    pull(value)
+
+  fs::file_delete(to_delete)
 }
