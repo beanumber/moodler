@@ -1,41 +1,74 @@
 globalVariables(c("Groups", "grade", "criterion", "."))
 
 #' Generate feedback report for Moodle
+#' @name feedback
 #' @param x a data.frame
+#' @param ... arguments passed to other functions
 #' @import dplyr
 #' @export
 #' @examples
 #' \dontrun{
 #' key <- "1S0vfV_xkebyTkC2bmhOv-MDNMLulb95GFwfvI9ZPtGw"
-#' if (gogglesheets) {
+#' if (require(googlesheets4)) {
+#'   # sheets_auth()
 #'   grades <- key %>%
-#'     gs_key() %>%
-#'     gs_read()
+#'     read_sheet()
 #' }
-#' feedback(grades)
+#' print_feedback(grades)
 #' }
 
-feedback <- function(x) {
+add_feedback <- function(x, ...) {
+  feedback <- x %>%
+    select(email_address, matches("\\("), ...) %>%
+    tidyr::pivot_longer(-email_address, names_to = "item", values_to = "grade") %>%
+    mutate(feedback_item = paste0(grade, ": ", item)) %>%
+    group_by(email_address) %>%
+    summarize(feedback = paste(feedback_item, collapse = "\n"))
+
   x %>%
-    filter(!is.na(Groups)) %>%
-    split(.$Groups) %>%
-    purrr::map(display)
+    left_join(feedback, by = "email_address") %>%
+    mutate(
+      feedback = paste0("Comments: ", Comments, "\n", feedback),
+      grade = ifelse(is.na(grade), 0, grade),
+      feedback = ifelse(is.na(grade), "No submission", feedback)
+    )
 }
 
 
-display <- function(x) {
-  out <- x %>%
-    tidyr::gather(key = "criterion", value = "grade", -Groups) %>%
-    filter(grade == 0, !grepl("judgment", criterion)) %>%
-    mutate(criterion = paste0("-", criterion)) %>%
-    pull(criterion)
+#' @rdname feedback
+#' @export
 
-  c(paste("Total:", x$Total),
-    paste("Comments:", x$Comments),
-    paste("Discretionary Points:", x$discretionary),
-    out)
+read_moodle_grades <- function(...) {
+  readr::read_csv(...) %>%
+    janitor::clean_names() %>%
+    mutate(
+      moodle_name = paste(first_name, last_name, "", sep = "_"),
+      moodle_name = tolower(str_remove_all(moodle_name, "['\\)\\(]")),
+      moodle_name = str_replace_all(moodle_name, " ", "_")
+    )
 }
 
+#' @rdname feedback
+#' @export
+
+read_moodle_sheet <- function(...) {
+  googlesheets4::read_sheet(...) %>%
+    mutate(
+      moodle_name = tolower(str_extract(Student, "^[a-zA-Z_-]+")),
+      moodle_name = str_replace_all(moodle_name, "__", "_")
+    )
+}
+
+#' @rdname feedback
+#' @param y other data.frame
+#' @export
+
+join_moodle <- function(x, y, ...) {
+  x %>%
+    full_join(y, by = "moodle_name") %>%
+    arrange(...) %>%
+    mutate(grade = Total)
+}
 
 #' Report on compilation in a directory
 #' @param path path to assignment directory

@@ -2,12 +2,26 @@
 % Please edit documentation in R/grading.R
 \name{feedback}
 \alias{feedback}
+\alias{add_feedback}
+\alias{read_moodle_grades}
+\alias{read_moodle_sheet}
+\alias{join_moodle}
 \title{Generate feedback report for Moodle}
 \usage{
-feedback(x)
+add_feedback(x, ...)
+
+read_moodle_grades(...)
+
+read_moodle_sheet(...)
+
+join_moodle(x, y, ...)
 }
 \arguments{
 \item{x}{a data.frame}
+
+\item{...}{arguments passed to other functions}
+
+\item{y}{other data.frame}
 }
 \description{
 Generate feedback report for Moodle
@@ -15,11 +29,11 @@ Generate feedback report for Moodle
 \examples{
 \dontrun{
 key <- "1S0vfV_xkebyTkC2bmhOv-MDNMLulb95GFwfvI9ZPtGw"
-if (gogglesheets) {
+if (require(googlesheets4)) {
+  # sheets_auth()
   grades <- key \%>\%
-    gs_key() \%>\%
-    gs_read()
+    read_sheet()
 }
-feedback(grades)
+print_feedback(grades)
 }
 }
