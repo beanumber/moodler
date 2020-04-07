@@ -10,10 +10,12 @@ install_makefile(path)
 
 summarize_assignment(path)
 
-winnow_group_submissions(path)
+winnow_group_submissions(path, regexp = "Group_[A-Z]+")
 }
 \arguments{
 \item{path}{A character vector of one or more paths.}
+
+\item{regexp}{Regular expression to match against folder names}
 }
 \description{
 Install makefiles

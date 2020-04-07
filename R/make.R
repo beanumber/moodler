@@ -42,14 +42,15 @@ summarize_assignment <- function(path) {
 }
 
 #' @rdname install_makefile
+#' @param regexp Regular expression to match against folder names
 #' @export
 #'
-winnow_group_submissions <- function(path) {
+winnow_group_submissions <- function(path, regexp = "Group_[A-Z]+") {
   dirs <- fs::dir_ls(path) %>%
     tibble::enframe(name = NULL) %>%
     dplyr::mutate(
       folder_name = fs::path_file(value),
-      group = stringr::str_extract(folder_name, "Group_[A-Z]+")
+      group = stringr::str_extract(folder_name, regexp)
     ) %>%
     group_by(group) %>%
     mutate(rank = min_rank(folder_name)) %>%
